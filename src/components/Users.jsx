@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { 
-  Container, 
+import {
+  Container,
   Table,
   TableBody,
   TableCell,
@@ -10,10 +10,11 @@ import {
   Paper,
   Typography,
   Avatar,
-  Box
+  Box,
 } from '@mui/material';
 import { Person } from '@mui/icons-material';
-import api from '../utils/axios';
+import { usersAPI } from '../services/api';
+import { UserTableSkeleton } from './SkeletonLoader';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -25,61 +26,63 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/users');
-      setUsers(response.data);
+      const response = await usersAPI.getAll();
+      const usersData = response.data.data.data || [];
+      setUsers(usersData);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return (
-      <Container>
-        <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-          Loading users...
-        </Typography>
-      </Container>
-    );
+    return <UserTableSkeleton rows={5} />;
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth='lg'>
       <Box sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Users
+        <Typography variant='h4' gutterBottom>
+          Users ({users?.length || 0} found)
         </Typography>
-        
+
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Avatar</TableCell>
                 <TableCell>Name</TableCell>
-                <TableCell>Username</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Website</TableCell>
-                <TableCell>Company</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Created At</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id} hover>
-                  <TableCell>
-                    <Avatar>
-                      <Person />
-                    </Avatar>
+              {users && users.length > 0 ? (
+                users.map((user) => (
+                  <TableRow key={user.id} hover>
+                    <TableCell>
+                      <Avatar>
+                        <Person />
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align='center'>
+                    {loading ? 'Loading users...' : 'No users found'}
                   </TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.website}</TableCell>
-                  <TableCell>{user.company?.name}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>

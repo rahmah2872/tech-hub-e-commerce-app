@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -24,23 +25,18 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email) => {
+  const login = async (email, password) => {
     try {
-      const mockUser = {
-        id: 1,
-        email: email,
-        name: 'Demo User',
-        role: 'customer'
-      };
-      const mockToken = 'demo-token-123';
+      const response = await authAPI.login({ email, password });
+      const { user, access_token } = response.data.data;
       
-      setUser(mockUser);
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      setUser(user);
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
       
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: error.response?.data?.message || error.message };
     }
   };
 

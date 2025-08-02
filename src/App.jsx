@@ -11,6 +11,7 @@ import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const AppContent = () => {
   const { darkMode } = useTheme();
@@ -56,31 +57,55 @@ const AppContent = () => {
   return (
     <MUIThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <BrowserRouter>
-          <Navigation />
-          <ProtectedRoute>
+      <ErrorBoundary fallbackMessage="We're having trouble loading the application. Please refresh the page.">
+        <AuthProvider>
+          <BrowserRouter>
+            <Navigation />
             <Routes>
-              <Route path="/products" element={<Products />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/" element={<Navigate to="/products" replace />} />
-              <Route path="/login" element={<Navigate to="/products" replace />} />
+              <Route 
+                path="/login" 
+                element={
+                  <PublicRoute>
+                    <ErrorBoundary fallbackMessage="There was an issue loading the login page.">
+                      <Login />
+                    </ErrorBoundary>
+                  </PublicRoute>
+                } 
+              />
+              <Route 
+                path="/*" 
+                element={
+                  <ProtectedRoute>
+                    <Routes>
+                      <Route path="/products" element={
+                        <ErrorBoundary fallbackMessage="Unable to load products. Please try again.">
+                          <Products />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/users" element={
+                        <ErrorBoundary fallbackMessage="Unable to load users. Please try again.">
+                          <Users />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/cart" element={
+                        <ErrorBoundary fallbackMessage="Unable to load cart. Please try again.">
+                          <Cart />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/checkout" element={
+                        <ErrorBoundary fallbackMessage="Unable to load checkout. Please try again.">
+                          <Checkout />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/" element={<Navigate to="/products" replace />} />
+                    </Routes>
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
-          </ProtectedRoute>
-          <Routes>
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              } 
-            />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </ErrorBoundary>
     </MUIThemeProvider>
   );
 };
