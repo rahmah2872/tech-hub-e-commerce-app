@@ -1,19 +1,20 @@
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
   Box,
   Badge,
   IconButton
 } from '@mui/material';
 import { ShoppingCart, Person, Logout, DarkMode, LightMode } from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useState, useEffect } from 'react';
-import techHubLight from '../assets/techhub-light.png';
-import techHubDark from '../assets/techhub-dark.png';
+// import techHubLight from '../assets/techhub-light.png';
+import log from '../assets/log.png';
+// import techhubw from '../assets/techhubw.png';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
@@ -29,7 +30,7 @@ const Navigation = () => {
     };
 
     updateCartCount();
-    
+
     const interval = setInterval(updateCartCount, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -43,11 +44,11 @@ const Navigation = () => {
     <AppBar position="static">
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-          <img 
-            src={darkMode ? techHubLight : techHubDark} 
-            alt="TechHub Logo" 
-            style={{ 
-              height: '40px', 
+          <img
+            src={log}
+            alt="TechHub Logo"
+            style={{
+              height: '50px',
               marginRight: '12px',
               cursor: 'pointer'
             }}
@@ -57,38 +58,43 @@ const Navigation = () => {
             E-Commerce App
           </Typography>
         </Box>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IconButton color="inherit" onClick={toggleDarkMode}>
             {darkMode ? <LightMode /> : <DarkMode />}
           </IconButton>
-          
+
           {user && (
             <>
               <Button color="inherit" component={Link} to="/products">
                 Products
               </Button>
-              
+
               <Button color="inherit" component={Link} to="/users">
                 <Person sx={{ mr: 1 }} />
                 Users
               </Button>
-              
+
+
               <Button color="inherit" component={Link} to="/cart">
                 <Badge badgeContent={cartCount} color="error">
                   <ShoppingCart />
                 </Badge>
               </Button>
-              
+
+
+
               <Button color="inherit" onClick={handleLogout}>
                 <Logout sx={{ mr: 1 }} />
                 Logout
               </Button>
             </>
           )}
+
         </Box>
       </Toolbar>
     </AppBar>
+
   );
 };
 

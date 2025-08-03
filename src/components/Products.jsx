@@ -1,20 +1,29 @@
 import { useState, useEffect } from 'react';
-import { 
-  Container, 
+import {
+  Container,
   Grid,
-  Card, 
-  CardContent, 
-  CardMedia, 
-  Typography, 
-  Button, 
-  TextField, 
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  TextField,
   Box,
   Chip,
   Pagination,
-  Stack
+  Stack,
 } from '@mui/material';
+import { Link } from 'react-router-dom';
+
 import { ShoppingCart } from '@mui/icons-material';
 import api from '../utils/axios';
+import * as React from 'react';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import ToggleButton from '@mui/material/ToggleButton';
+
+
+
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -23,7 +32,10 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(6);
-
+  const [view, setView] = React.useState('list');
+  const handleChange = (event, nextView) => {
+    setView(nextView);
+  };
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -64,13 +76,13 @@ const Products = () => {
   const addToCart = (product) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existingItem = cart.find(item => item.id === product.id);
-    
+
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
       cart.push({ ...product, quantity: 1 });
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(cart));
   };
 
@@ -95,54 +107,80 @@ const Products = () => {
 
   return (
     <Container maxWidth="lg">
+
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" gutterBottom>
           Products ({filteredProducts.length} items)
-        </Typography>
-        
-        <TextField
-          fullWidth
-          label="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ mb: 3 }}
-        />
 
-        <Grid container spacing={3}>
+
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <TextField
+            fullWidth
+            label="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ mb: 3 }}
+          />
+          <ToggleButton sx={{ color: '#729FB8', mb: 3 }} value="view" onClick={() => setView(view === 'list' ? 'module' : 'list')}>
+            {view === 'list' ? <ViewModuleIcon /> : <ViewListIcon />}
+          </ToggleButton>
+
+        </Box>
+
+        <Grid container spacing={{ xs: 3 }}
+
+        >
           {currentProducts.map((product) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={product.id}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Grid
+              key={product.id}
+              size={{ xs: 12, sm: view === 'list' ? 12 : 6, md: view === 'list' ? 12 : 4 }}
+            >
+              <Card sx={{ height: '100%', display: 'flex', alignItems: "center", flexDirection: view === 'list' ? 'row' : 'column' }}>
                 <CardMedia
                   component="img"
                   height="200"
+
+                  sx={{ width: view === 'list' ? 151 : '100%' }}
                   image={product.image}
                   alt={product.title}
+
+
+
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" gutterBottom>
-                    {product.title.length > 50 
-                      ? `${product.title.substring(0, 50)}...` 
+                    {product.title.length > 50
+                      ? `${product.title.substring(0, 50)}...`
                       : product.title
                     }
                   </Typography>
-                  
-                  <Chip 
-                    label={product.category} 
-                    size="small" 
-                    sx={{ mb: 1 }} 
+
+                  <Chip
+                    label={product.category}
+                    size="small"
+                    sx={{ mb: 1 }}
                   />
-                  
+
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {product.description.length > 100 
-                      ? `${product.description.substring(0, 100)}...` 
+                    {product.description.length > 100
+                      ? `${product.description.substring(0, 100)}...`
                       : product.description
                     }
                   </Typography>
-                  
-                  <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+
+                  <Typography variant="h6" color="#9EC7DE" sx={{ mb: 2 }}>
                     ${product.price}
                   </Typography>
-                  
+
+
+                  <Button
+                    variant="outlined" color="#9EC7DE" sx={{ margin: 1 }}
+
+                    component={Link} to={`/products/${product.id}`} >  More..
+                  </Button>
+
                   <Button
                     variant="contained"
                     fullWidth
@@ -150,8 +188,13 @@ const Products = () => {
                     onClick={() => addToCart(product)}
                   >
                     Add to Cart
+
                   </Button>
+
+
+
                 </CardContent>
+
               </Card>
             </Grid>
           ))}
@@ -168,7 +211,7 @@ const Products = () => {
               showFirstButton
               showLastButton
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="#9EC7DE">
               Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
             </Typography>
           </Stack>
@@ -180,7 +223,7 @@ const Products = () => {
           </Typography>
         )}
       </Box>
-    </Container>
+    </Container >
   );
 };
 
