@@ -20,14 +20,14 @@ const AppContent = () => {
     palette: {
       mode: darkMode ? 'dark' : 'light',
       primary: {
-        main: '#CCDC28',
+        main: '#9EC7DE',
         contrastText: '#000000',
       },
       secondary: {
-        main: darkMode ? '#CCDC28' : '#1976d2',
+        main: darkMode ? '#9EC7DE' : '#1976d2',
       },
       background: {
-        default: darkMode ? '#121212' : '#ffffff',
+        default: darkMode ? '#07233B' : '#ffffff',
         paper: darkMode ? '#1e1e1e' : '#ffffff',
       },
     },

@@ -176,7 +176,7 @@ const Products = () => {
 
 
                   <Button
-                    variant="outlined" color="#9EC7DE" sx={{ margin: 1 }}
+                    variant="contained" color='#9EC7DE'  sx={{mb:2,display:'flex',justifySelf:'flex-end',width:'70'}}
 
                     component={Link} to={`/products/${product.id}`} >  More..
                   </Button>
